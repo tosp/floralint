@@ -24,6 +24,7 @@ class FloraLint:
         self.css_list = []
         self.css_rules = []
         self.css_errors = []
+        self.success = True
 
     def get_css_files(self):
         css_links = self.soup.findAll('link')
@@ -55,11 +56,20 @@ class FloraLint:
 
     def test_bold_italic(self):
         bolds = self.soup.findAll('b')
-        for b in bolds:
-            print(b)
+        if len(bolds) > 0:
+            self.success = False
+            print(Fore.RED+"\nThe following <b> tags need to be changed for <strong>")
+            self.resetColor()
+            for b in bolds:
+                print(b)
+
         italics = self.soup.findAll('b')
-        for i in italics:
-            print(i)
+        if len(italics) > 0:
+            self.success = False
+            print(Fore.RED+"\nThe following <i> tags need to be changed for <em>")
+            self.resetColor()
+            for i in italics:
+                print(i)
     
     def test_wcag_f39(self):
         """ F39:
@@ -69,7 +79,7 @@ class FloraLint:
         """
         images = self.soup.findAll('img')
         for image in images:
-            if 'alt' in image:
+            if 'alt' in image.attrs:
                 for description in better_as_null_en:
                     if image['alt'] == description:
                         print('The alt value {} is not very descriptive'
@@ -90,7 +100,8 @@ class FloraLint:
         """
         images = self.soup.findAll('img')
         for image in images:
-            if 'alt' not in image:
+            if 'alt' not in image.attrs:
+                self.success = False
                 print(Fore.RED+'Shitty code, no alt html value')
                 self.resetColor()
                 print(image.attrs)
@@ -104,6 +115,9 @@ class FloraLint:
         self.get_css_files()
         self.parse_css_links()
         self.test_all()
+        if(self.success):
+            print(Fore.GREEN+"\nLint completed succesfully with no errors")
+            self.resetColor()
         # self.get_js_functions()
 
 
@@ -115,5 +129,7 @@ class FloraLint:
 
 #     args = parser.parse_args()
 #     print(args.accumulate(args.integers))
-lint = FloraLint('http://127.0.0.1:8000/access')
+
+# lint = FloraLint('http://127.0.0.1:8000/not-access')
+lint = FloraLint('http://127.0.0.1:8000/not-access')
 lint.main()
