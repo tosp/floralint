@@ -3,9 +3,11 @@
 import urllib.request
 import re
 
+import tinycss
 from bs4 import BeautifulSoup
 
 from rules_data import better_as_null_en, better_as_null_es
+from js_data import js_events
 
 
 class FloraLint:
@@ -13,10 +15,11 @@ class FloraLint:
     def __init__(self, url='https://tosp.io'):
         print("Initializing...")
         self.url = url
-        raw = urllib.request.urlopen(url)
-        self.html = raw.read()
+        self.html = urllib.request.urlopen(url).read()
         self.soup = BeautifulSoup(self.html, "html.parser")
         self.css_list = []
+        self.css_rules = []
+        self.css_errors = []
 
     def get_css_files(self):
         css_links = self.soup.findAll('link')
@@ -25,6 +28,21 @@ class FloraLint:
             if not re.match(http_re, link['href']):
                 self.css_list.append(self.url+link['href'])
         print(self.css_list)
+
+    def parse_css_links(self):
+        css_parser = tinycss.make_parser('page3')
+        for css_url in self.css_list:
+            raw = urllib.request.urlopen(css_url)
+            style = css_parser.parse_stylesheet_bytes(raw.read())
+            for rule in style.rules:
+                self.css_rules.append(rule)
+            for err in style.errors:
+                self.css_errors.append(err)
+
+    def get_js_functions(self):
+        for line in self.soup:
+            print("GIGIGI",line)
+
 
     def test_wcag_f39(self):
         """ F39:
@@ -64,8 +82,10 @@ class FloraLint:
 
     def main(self):
         self.get_css_files()
+        self.parse_css_links()
         self.test_all()
+        # self.get_js_functions()
 
 
-lint = FloraLint('https://tosp.io')
+lint = FloraLint('http://127.0.0.1:8000')
 lint.main()
