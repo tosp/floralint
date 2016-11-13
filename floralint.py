@@ -8,5 +8,5 @@ images = soup.findAll('img')
 
 for image in images:
     if 'alt' not in image:
-        print('Shitty code, no alt html value')
+        print('Shitty code, no alt html attribute')
     print(image.attrs)
