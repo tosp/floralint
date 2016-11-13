@@ -71,25 +71,24 @@ class FloraLint:
         for image in images:
             if 'alt' in image:
                 for description in better_as_null_en:
-                    if image['alt'] == description:
+                    if image.attrs['alt'] == description:
                         print('The alt value {} is not very descriptive'
                               .format(description))
                         print('It would be better as a null value')
                 for description in better_as_null_es:
-                    if image['alt'] == description:
+                    if image.attrs['alt'] == description:
                         print('The alt value {} is not very descriptive'
                               .format(description))
-                      print('It would be better as a null value')
+                        print('It would be better as a null value')
 
     def test_wcag_f41(self):
         """ F41:
         Failure of Success Criterion 2.2.1, 2.2.4, and 3.2.5
         due to using meta refresh to reload the page.
         """
-
         meta_tags = self.soup.findAll('meta')
         for tag in meta_tags:
-            if 'http-equiv' in image:
+            if 'http-equiv' in tag.attrs:
                 if tag['http-equiv'] == refresh:
                     print('It is not advisable to refersh the page this way '
                           'users with screen readers will may not be able'
@@ -105,14 +104,14 @@ class FloraLint:
         """
         images = self.soup.findAll('img')
         for image in images:
-            if 'alt' not in image:
+            if 'alt' not in image.attrs:
                 print(Fore.RED+'Shitty code, no alt html value')
                 self.resetColor()
                 print(image.attrs)
 
     def test_all(self):
         self.test_wcag_f39()
-        self.test_wcag_f47()
+        self.test_wcag_f41()
         self.test_wcag_f65()
         self.test_bold_italic()
 
