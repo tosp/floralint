@@ -153,6 +153,6 @@ class FloraLint:
 #     args = parser.parse_args()
 #     print(args.accumulate(args.integers))
 
-lint = FloraLint('http://127.0.0.1:8000/access')
-# lint = FloraLint('http://127.0.0.1:8000/not-access')
+# lint = FloraLint('http://127.0.0.1:8000/access')
+lint = FloraLint('http://127.0.0.1:8000/not-access')
 lint.main()
