@@ -24,7 +24,7 @@ class FloraLint:
         css_links = self.soup.findAll('link')
         http_re = re.compile(r'https:.?')
         for link in css_links:
-            if not re.match(http_re,link['href']):
+            if not re.match(http_re, link['href']):
                 self.css_list.append(self.url+link['href'])
         print(self.css_list)
 
@@ -58,9 +58,6 @@ class FloraLint:
         self.parse_css_links()
         self.test_all()
         # self.get_js_functions()
-
-
-
 
 
 lint = FloraLint('http://127.0.0.1:8000')
