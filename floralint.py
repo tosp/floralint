@@ -20,10 +20,9 @@ class FloraLint:
         css_links = self.soup.findAll('link')
         http_re = re.compile(r'https:.?')
         for link in css_links:
-            if not re.match(http_re,link['href']):
+            if not re.match(http_re, link['href']):
                 self.css_list.append(self.url+link['href'])
         print(self.css_list)
-
 
     # Images with no alt
     def test_wcag_f65(self):
@@ -39,10 +38,6 @@ class FloraLint:
     def main(self):
         self.get_css_files()
         self.test_all()
-
-
-
-
 
 
 lint = FloraLint('https://tosp.io')
