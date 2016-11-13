@@ -11,3 +11,4 @@ for image in images:
     if 'alt' not in image:
         print('Shitty code, no alt html value')
     print(image.attrs)
+    
