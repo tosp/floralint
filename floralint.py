@@ -2,9 +2,11 @@
 
 import urllib.request
 import re
+import argparse
 
 import tinycss
 from bs4 import BeautifulSoup
+from colorama import Fore, Back, Style, init
 
 from rules_data import better_as_null_en, better_as_null_es
 from js_data import js_events
@@ -13,7 +15,9 @@ from js_data import js_events
 class FloraLint:
 
     def __init__(self, url='https://tosp.io'):
-        print("Initializing...")
+        init()
+        print(Fore.GREEN+"Initializing...\n")
+        self.resetColor()
         self.url = url
         self.html = urllib.request.urlopen(url).read()
         self.soup = BeautifulSoup(self.html, "html.parser")
@@ -27,7 +31,10 @@ class FloraLint:
         for link in css_links:
             if not re.match(http_re, link['href']):
                 self.css_list.append(self.url+link['href'])
+        print(Fore.YELLOW+"Obtaining following CSS")
+        self.resetColor()       
         print(self.css_list)
+        print()
 
     def parse_css_links(self):
         css_parser = tinycss.make_parser('page3')
@@ -43,7 +50,17 @@ class FloraLint:
         for line in self.soup:
             print("GIGIGI",line)
 
+    def resetColor(self):
+        print(Style.RESET_ALL,end="")
 
+    def test_bold_italic(self):
+        bolds = self.soup.findAll('b')
+        for b in bolds:
+            print(b)
+        italics = self.soup.findAll('b')
+        for i in italics:
+            print(i)
+    
     def test_wcag_f39(self):
         """ F39:
         Failure of Success Criterion 1.1.1 due to providing a
@@ -64,21 +81,24 @@ class FloraLint:
                               .format(description))
                         print('It would be better as a null value')
 
+
     def test_wcag_f65(self):
         """ F65:
         Failure of Success Criterion 1.1.1 due to omitting
         the alt attribute or text alternative on img elements,
         area elements, and input elements of type "image".
         """
-
         images = self.soup.findAll('img')
         for image in images:
             if 'alt' not in image:
-                print('Shitty code, no alt html value')
+                print(Fore.RED+'Shitty code, no alt html value')
+                self.resetColor()
                 print(image.attrs)
 
     def test_all(self):
+        self.test_wcag_f39()
         self.test_wcag_f65()
+        self.test_bold_italic()
 
     def main(self):
         self.get_css_files()
@@ -87,5 +107,13 @@ class FloraLint:
         # self.get_js_functions()
 
 
-lint = FloraLint('http://127.0.0.1:8000')
+
+# while True:
+#     parser = argparse.ArgumentParser(description='Process some integers.')
+#     parser.add_argument('integers', metavar='N', type=int, nargs='+',
+#                     help='an integer for the accumulator')
+
+#     args = parser.parse_args()
+#     print(args.accumulate(args.integers))
+lint = FloraLint('http://127.0.0.1:8000/access')
 lint.main()
