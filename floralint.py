@@ -26,6 +26,7 @@ class FloraLint:
                 self.css_list.append(self.url+link['href'])
         print(self.css_list)
 
+
     def test_wcag_f39(self):
         """ F39:
         Failure of Success Criterion 1.1.1 due to providing a
@@ -44,7 +45,22 @@ class FloraLint:
                     if image['alt'] == description:
                         print('The alt value {} is not very descriptive'
                               .format(description))
-                        print('It would be better as a null value')
+                      print('It would be better as a null value')
+
+    def test_wcag_f41(self):
+        """ F41:
+        Failure of Success Criterion 2.2.1, 2.2.4, and 3.2.5
+        due to using meta refresh to reload the page.
+        """
+
+        meta_tags = self.soup.findAll('meta')
+        for tag in meta_tags:
+            if 'http-equiv' in image:
+                if tag['http-equiv'] == refresh:
+                    print('It is not advisable to refersh the page this way '
+                          'users with screen readers will may not be able'
+                          'to see the whole page')
+                    print(tag.attrs)
 
     def test_wcag_f65(self):
         """ F65:
@@ -60,6 +76,8 @@ class FloraLint:
                 print(image.attrs)
 
     def test_all(self):
+        self.test_wcag_f39()
+        self.test_wcag_f47()
         self.test_wcag_f65()
 
     def main(self):
