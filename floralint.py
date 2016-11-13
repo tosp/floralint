@@ -5,6 +5,8 @@ import re
 
 from bs4 import BeautifulSoup
 
+from rules_data import better_as_null_en, better_as_null_es
+
 
 class FloraLint:
 
@@ -24,8 +26,33 @@ class FloraLint:
                 self.css_list.append(self.url+link['href'])
         print(self.css_list)
 
-    # Images with no alt
+    def test_wcag_f39(self):
+        """ F39:
+        Failure of Success Criterion 1.1.1 due to providing a
+        text alternative that is not null (e.g., alt="spacer" or alt="image")
+        for images that should be ignored by assistive technology.
+        """
+        images = self.soup.findAll('img')
+        for image in images:
+            if 'alt' in image:
+                for description in better_as_null_en:
+                    if image['alt'] == description:
+                        print('The alt value {} is not very descriptive'
+                              .format(description))
+                        print('It would be better as a null value')
+                for description in better_as_null_es:
+                    if image['alt'] == description:
+                        print('The alt value {} is not very descriptive'
+                              .format(description))
+                        print('It would be better as a null value')
+
     def test_wcag_f65(self):
+        """ F65:
+        Failure of Success Criterion 1.1.1 due to omitting
+        the alt attribute or text alternative on img elements,
+        area elements, and input elements of type "image".
+        """
+
         images = self.soup.findAll('img')
         for image in images:
             if 'alt' not in image:
