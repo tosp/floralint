@@ -6,14 +6,15 @@ import re
 import tinycss
 from bs4 import BeautifulSoup
 
+from js_data import js_events
+
 
 class FloraLint:
 
     def __init__(self, url='https://tosp.io'):
         print("Initializing...")
         self.url = url
-        raw = urllib.request.urlopen(url)
-        self.html = raw.read()
+        self.html = urllib.request.urlopen(url).read()
         self.soup = BeautifulSoup(self.html, "html.parser")
         self.css_list = []
         self.css_rules = []
@@ -37,6 +38,10 @@ class FloraLint:
             for err in style.errors:
                 self.css_errors.append(err)
 
+    def get_js_functions(self):
+        for line in self.soup:
+            print("GIGIGI",line)
+
     # Images with no alt
     def test_wcag_f65(self):
         images = self.soup.findAll('img')
@@ -52,12 +57,11 @@ class FloraLint:
         self.get_css_files()
         self.parse_css_links()
         self.test_all()
-        print("RULES: ",self.css_rules)
+        # self.get_js_functions()
 
 
 
 
 
-
-lint = FloraLint('https://tosp.io')
+lint = FloraLint('http://127.0.0.1:8000')
 lint.main()
