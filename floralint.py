@@ -2,14 +2,14 @@
 
 import urllib.request
 import re
-import argparse
+# import argparse
 
 import tinycss
 from bs4 import BeautifulSoup
-from colorama import Fore, Back, Style, init
+from colorama import Fore, Style, init
 
 from rules_data import better_as_null_en, better_as_null_es
-from js_data import js_events
+# from js_data import js_events
 
 
 class FloraLint:
@@ -33,7 +33,7 @@ class FloraLint:
             if not re.match(http_re, link['href']):
                 self.css_list.append(self.url+link['href'])
         print(Fore.YELLOW+"Obtaining following CSS")
-        self.resetColor()       
+        self.resetColor()
         print(self.css_list)
         print()
 
@@ -49,16 +49,17 @@ class FloraLint:
 
     def get_js_functions(self):
         for line in self.soup:
-            print("GIGIGI",line)
+            print("GIGIGI", line)
 
-    def resetColor(self):
-        print(Style.RESET_ALL,end="")
+    def reset_color(self):
+        print(Style.RESET_ALL, end="")
 
     def test_bold_italic(self):
         bolds = self.soup.findAll('b')
         if len(bolds) > 0:
             self.success = False
-            print(Fore.RED+"\nThe following <b> tags need to be changed for <strong>")
+            error = '\nThe following <b> tags need to be changed for <strong>'
+            print(Fore.RED + error)
             self.resetColor()
             for b in bolds:
                 print(b)
@@ -66,11 +67,12 @@ class FloraLint:
         italics = self.soup.findAll('b')
         if len(italics) > 0:
             self.success = False
-            print(Fore.RED+"\nThe following <i> tags need to be changed for <em>")
+            error = '\nThe following <i> tags need to be changed for <em>'
+            print(Fore.RED + error)
             self.resetColor()
             for i in italics:
                 print(i)
-    
+
     def test_wcag_f39(self):
         """ F39:
         Failure of Success Criterion 1.1.1 due to providing a
@@ -82,7 +84,7 @@ class FloraLint:
             if 'alt' in image.attrs:
                 for description in better_as_null_en:
                     if image.attrs['alt'] == description:
-                        print(Fore.RED + 'The alt value {} is not very descriptive'
+                        print(Fore.RED + 'The alt value {} is not descriptive'
                               .format(description))
                         print('It would be better as a null value')
                         self.resetColor()
@@ -90,7 +92,7 @@ class FloraLint:
                         print()
                 for description in better_as_null_es:
                     if image.attrs['alt'] == description:
-                        print(Fore.RED + 'The alt value {} is not very descriptive'
+                        print(Fore.RED + 'The alt value {} is not descriptive'
                               .format(description))
                         print('It would be better as a null value')
                         self.resetColor()
@@ -106,13 +108,12 @@ class FloraLint:
         for tag in meta_tags:
             if 'http-equiv' in tag.attrs:
                 if tag.attrs['http-equiv'] == 'refresh':
-                    print(Fore.RED + 'It is not advisable to refersh the page this way '
-                          'users with screen readers will may not be able'
-                          'to see the whole page')
+                    print(Fore.RED + 'It is not advisable to refersh the page '
+                          'this way users with screen readers will may not be '
+                          'able to see the whole page')
                     self.resetColor()
                     print(tag)
                     print()
-
 
     def test_wcag_f65(self):
         """ F65:
@@ -143,8 +144,6 @@ class FloraLint:
             self.resetColor()
         # self.get_js_functions()
 
-
-
 # while True:
 #     parser = argparse.ArgumentParser(description='Process some integers.')
 #     parser.add_argument('integers', metavar='N', type=int, nargs='+',
@@ -154,5 +153,4 @@ class FloraLint:
 #     print(args.accumulate(args.integers))
 
 lint = FloraLint('http://127.0.0.1:8000/access')
-# lint = FloraLint('http://127.0.0.1:8000/not-access')
 lint.main()
